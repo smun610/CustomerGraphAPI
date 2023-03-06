@@ -1,0 +1,23 @@
+type Customer {
+  uid: String
+  firstname: String
+  lastname: String
+  dob: String
+}
+
+input CustomerInput {
+  firstname: String!
+  lastname: String!
+  dob: String!
+}
+
+type Query {
+  findAllCustomers: [Customer]
+  findCustomerById (uid: String): Customer
+}
+
+type Mutation{
+  addNewCustomer(customerInput: CustomerInput!) : Customer!
+  updateCustomerNames (id: String, firstname: String, lastname: String ): String!
+  deleteCustomerById (id: String): String!
+}
