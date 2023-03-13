@@ -36,7 +36,7 @@ public class CustomerService {
         return Optional.ofNullable(customerRepository.findById(uuid).orElseThrow(() -> new CustomException(CustomerErrorMessage.ID_NOT_FOUND.getMessage() + id)));
     }
 
-    public Customer addNewCustomer(final CustomerInput customerInput) {
+    public String addNewCustomer(final CustomerInput customerInput) {
         LocalDateTime dob;
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK);
@@ -45,8 +45,8 @@ public class CustomerService {
             throw new CustomException(CustomerErrorMessage.DATE_ERROR.getMessage());
         }
         Customer customerToSave = new Customer(customerInput.getFirstname(), customerInput.getLastname(), dob);
-        customerRepository.save(customerToSave);
-        return customerToSave;
+        Customer save = customerRepository.save(customerToSave);
+        return save.getUid().toString();
     }
 
     public UUID updateCustomerName(final String id, final String firstname, final String lastname) {

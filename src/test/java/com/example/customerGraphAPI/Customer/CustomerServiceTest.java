@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,6 +26,7 @@ class CustomerServiceTest {
     @Mock
     private CustomerRepository customerRepositoryMock;
 
+
     @Captor
     private ArgumentCaptor<Customer> customerArgumentCaptor;
 
@@ -32,18 +34,17 @@ class CustomerServiceTest {
 
     @BeforeEach
     void setUp() {
-
         dob = getTestDob();
     }
 
     @Test
     void itShouldFindAllCustomer() {
         // Given
-        CustomerRepository mockCustomerRepository = Mockito.mock(CustomerRepository.class);
+
         // When
-        when(mockCustomerRepository.findAll()).thenReturn(Lists.newArrayList(new Customer("test", "test", LocalDateTime.now())));
+        when(customerRepositoryMock.findAll()).thenReturn(Lists.newArrayList(new Customer("test", "test", LocalDateTime.now())));
         // Then
-        assertEquals(mockCustomerRepository.findAll().size(), 1);
+        assertEquals(customerRepositoryMock.findAll().size(), 1);
     }
 
     @Test
@@ -64,7 +65,9 @@ class CustomerServiceTest {
         //Given
 
         CustomerInput customerInput = new CustomerInput("test", "test", "20-03-1991");
-
+        Customer customer = new Customer ("test", "test", null);
+        customer.setUid(UUID.randomUUID());
+        when(customerRepositoryMock.save(any())).thenReturn(customer);
         customerServiceUnderTest.addNewCustomer(customerInput);
         //When
 
@@ -133,7 +136,7 @@ class CustomerServiceTest {
     }
 
     @Test
-    void itShouldDeleteCustomerByID (){
+    void itShouldDeleteCustomerByID() {
         //Given
         UUID uidTest = UUID.randomUUID();
         //When
@@ -141,8 +144,9 @@ class CustomerServiceTest {
         UUID idReturned = customerServiceUnderTest.deleteCustomerById(uidTest.toString());
         //Then
         verify(customerRepositoryMock).deleteById(uidTest);
-        assertEquals(uidTest,idReturned);
+        assertEquals(uidTest, idReturned);
     }
+
     LocalDateTime getTestDob() {
         LocalDateTime dob;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK);

@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -27,27 +29,32 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
+    @Secured("ROLE_USER")
     @QueryMapping
     public List<Customer> findAllCustomers() {
         return customerService.findAllCustomer();
     }
 
+    @Secured("ROLE_USER")
     @QueryMapping
     public Optional<Customer> findCustomerById(@Argument String uid) {
         return customerService.findCustomerById(uid);
     }
 
+    @Secured("ROLE_ADMIN")
     @MutationMapping
-    public Customer addNewCustomer(@Argument CustomerInput customerInput) {
+    public String addNewCustomer(@Argument CustomerInput customerInput) {
         return customerService.addNewCustomer(customerInput);
     }
 
+    @Secured("ROLE_ADMIN")
     @MutationMapping
     public UUID updateCustomerNames(@Argument String id, @Argument String firstname, @Argument String lastname) {
 
         return customerService.updateCustomerName(id, firstname, lastname);
     }
 
+    @Secured("ROLE_ADMIN")
     @MutationMapping
     public UUID deleteCustomerById(@Argument String id) {
         return customerService.deleteCustomerById(id);

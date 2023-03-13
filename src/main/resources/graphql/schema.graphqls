@@ -17,7 +17,7 @@ type Query {
 }
 
 type Mutation{
-  addNewCustomer(customerInput: CustomerInput!) : Customer!
+  addNewCustomer(customerInput: CustomerInput!) : String!
   updateCustomerNames (id: String, firstname: String, lastname: String ): String!
   deleteCustomerById (id: String): String!
 }
