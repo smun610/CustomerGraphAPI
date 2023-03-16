@@ -4,7 +4,10 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -12,7 +15,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -121,6 +123,40 @@ class CustomerServiceTest {
         Customer capturedCustomerValues = customerArgumentCaptor.getValue();
         assertEquals(capturedCustomerValues.getLastname(), lastNameTest);
         assertEquals(capturedCustomerValues.getFirstname(), firstNameTest);
+    }
+
+    @Test
+    void itShouldUpdateCustomerFirstName() {
+        //Given
+        UUID uidTest = UUID.randomUUID();
+        String firstNameTest = "Bob";
+        String lastNameTest = " ";
+        //When
+        Customer existingCustomer = new Customer("jim", "Mathew", dob);
+        when(customerRepositoryMock.findById(uidTest)).thenReturn(Optional.of(existingCustomer));
+        customerServiceUnderTest.updateCustomerName(uidTest.toString(), firstNameTest, lastNameTest);
+        //Then
+        verify(customerRepositoryMock).save(customerArgumentCaptor.capture());
+        Customer capturedCustomerValues = customerArgumentCaptor.getValue();
+        assertEquals(capturedCustomerValues.getLastname(), existingCustomer.getLastname());
+        assertEquals(capturedCustomerValues.getFirstname(), firstNameTest);
+    }
+
+    @Test
+    void itShouldUpdateCustomerLastName() {
+        //Given
+        UUID uidTest = UUID.randomUUID();
+        String firstNameTest = " ";
+        String lastNameTest = "test2";
+        //When
+        Customer existingCustomer = new Customer("jim", "Mathew", dob);
+        when(customerRepositoryMock.findById(uidTest)).thenReturn(Optional.of(existingCustomer));
+        customerServiceUnderTest.updateCustomerName(uidTest.toString(), firstNameTest, lastNameTest);
+        //Then
+        verify(customerRepositoryMock).save(customerArgumentCaptor.capture());
+        Customer capturedCustomerValues = customerArgumentCaptor.getValue();
+        assertEquals(capturedCustomerValues.getLastname(), lastNameTest);
+        assertEquals(capturedCustomerValues.getFirstname(), existingCustomer.getFirstname());
     }
 
     @Test

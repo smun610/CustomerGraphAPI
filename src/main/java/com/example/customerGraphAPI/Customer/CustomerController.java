@@ -6,7 +6,6 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -56,7 +55,7 @@ public class CustomerController {
 
     @Secured("ROLE_ADMIN")
     @MutationMapping
-    public UUID deleteCustomerById(@Argument String id) {
-        return customerService.deleteCustomerById(id);
+    public String deleteCustomerById(@Argument String id) {
+        return customerService.deleteCustomerById(id).toString();
     }
 }

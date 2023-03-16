@@ -5,7 +5,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureGraphQlTester;
 import org.springframework.boot.test.autoconfigure.graphql.tester.AutoConfigureHttpGraphQlTester;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -16,11 +15,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.*;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-import static org.assertj.core.api.Assertions.*;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -174,7 +171,7 @@ class CustomerControllerIntTest {
                 .document(document)
                 .variable("id", customer.getUid().toString())
                 .variable("firstname", firstname)
-                .variable("lastName", lastname)
+                .variable("lastname", lastname)
                 .execute()
                 .path("updateCustomerNames")
                 .entity(String.class)
@@ -183,14 +180,32 @@ class CustomerControllerIntTest {
         then(customerRepository).should().save(customerArgumentCaptor.capture());
         Customer customerArgumentCaptorValue = customerArgumentCaptor.getValue();
         assertThat(customerArgumentCaptorValue.getFirstname()).isEqualTo(firstname);
-        assertThat(customerArgumentCaptorValue.getFirstname()).isEqualTo(lastname);
+        assertThat(customerArgumentCaptorValue.getLastname()).isEqualTo(lastname);
     }
 
     @Test
     void itShouldDeleteCustomerById() {
         // Given
+        Customer customer = getCustomer();
+        given(customerRepository.findById(any())).willReturn(Optional.ofNullable(customer));
+        String document = """
+                mutation deleteCustomerById($id: String) {
+                    deleteCustomerById(id: $id)
+                }
+                """;
         // When
+        HttpGraphQlTester httpGraphQlTester = asAdmin(graphQlTester);
+        String customerUid = customer.getUid().toString();
+        httpGraphQlTester
+                .document(document)
+                .variable("id", customerUid)
+                .execute()
+                .path("deleteCustomerById")
+                .entity(String.class)
+                .satisfies(id -> assertEquals(id, customerUid));
         // Then
+        then(customerRepository).should().deleteById(UUID.fromString(customerUid));
+
 
     }
 

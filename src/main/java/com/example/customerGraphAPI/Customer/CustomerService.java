@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-//TODO add caching
 
 @Service
 
@@ -49,6 +48,8 @@ public class CustomerService {
         return save.getUid().toString();
     }
 
+
+
     public UUID updateCustomerName(final String id, final String firstname, final String lastname) {
         UUID uuid = convertStringToUUID(id);
 
@@ -59,8 +60,8 @@ public class CustomerService {
         }
 
         customer.ifPresent(customer1 -> {
-            customer1.setFirstname(firstname);
-            customer1.setLastname(lastname);
+            customer1.setFirstname(firstname.trim().isEmpty() ? customer1.getFirstname() : firstname);
+            customer1.setLastname(lastname.trim().isEmpty() ? customer1.getFirstname() : lastname);
             customerRepository.save(customer1);
         });
 
